@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jointest">
+    
+    <resultMap type="empDTO" id="oneMap">
+    	<result property="empno" column="empno"/>
+    	<result property="name" column="name"/>
+    	<result property="phone" column="phone"/>
+    	<result property="email" column="email"/>
+    	<result property="regdate" column="regdate"/>
+    	<result property="zipcode" column="zipcode"/>
+    	<result property="address" column="address"/>
+    	<result property="deptno" column="deptno"/>
+    	<result property="ebdto.empno" column="empno2"/>
+    	<result property="ebdto.weight" column="weight"/>
+    	<result property="ebdto.height" column="height"/>
+    	<result property="ebdto.blood" column="blood"/>
+    </resultMap>
+    <select id="oneToOne" parameterType="int" resultMap="oneMap">
+	    select e.empno, e.name, e.phone, e.email, e.regdate, e.zipcode, e.address,
+		e.deptno, b.empno as empno2, b.weight, b.height, b.blood
+		from emp e, emp_body b
+		where e.empno = b.empno
+		and e.empno=#{empno} <!-- oneToOne에는 이 마지막 문장이 추가된다. --> 
+    </select>
+    <select id="oneToOneList" resultMap="oneMap"> <!-- 여러개 받아올 수 있다. List  : selectList 호출하면 된다. -->
+	    select e.empno, e.name, e.phone, e.email, e.regdate, e.zipcode, e.address,
+		e.deptno, b.empno as empno2, b.weight, b.height, b.blood
+		from emp e, emp_body b
+		where e.empno = b.empno    	
+    </select>
+    
+    
+   	<resultMap type="deptDTO" id="manyMap">
+   		<result property="deptno" column="deptno"/>
+   		<result property="deptname" column="deptname"/>
+   		<collection property="empdtoList" column="deptno" javaType="List" ofType="empDTO"
+   			resultMap="jointest.empDTOListMap"/>
+  	</resultMap>
+   	<resultMap type="empDTO" id="empDTOListMap">
+	   	<result property="empno" column="empno"/>
+		<result property="name" column="name"/>
+		<result property="phone" column="phone"/>
+		<result property="email" column="email"/>
+		<result property="regdate" column="regdate"/>
+		<result property="zipcode" column="zipcode"/>
+		<result property="address" column="address"/>
+		<result property="deptno" column="deptno"/>
+   	</resultMap>
+    <select id="oneToMany" parameterType="int" resultMap="manyMap">
+    	select e.empno, e.name, e.phone, e.email, e.regdate, e.zipcode, e.address,
+		e.deptno,d.deptno as deptno2, d.deptname
+		from emp e, dept d
+		where d.deptno = e.deptno
+		and d.deptno = #{deptno}
+    </select> 
+    <select id="oneToManyList" parameterType="int" resultMap="manyMap">
+    	select e.empno, e.name, e.phone, e.email, e.regdate, e.zipcode, e.address,
+		e.deptno,d.deptno as deptno2, d.deptname
+		from emp e, dept d
+		where d.deptno = e.deptno<!-- 사원과 부서에 대한 정보를 다 나오도록 한다. -->
+    </select> 
+   
+     
+</mapper>
+
